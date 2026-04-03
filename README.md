@@ -20,7 +20,7 @@ Pen and paper quiz:
 
 - 20 mins;
 - closed book, no devices;
-- you get random 3 questions from the question bank;
+- you get 3 random questions from the question bank;
 - answer at least 2.
 
 ## Task 2 (approved by TA during the lab)
@@ -133,7 +133,7 @@ Submit a presentation with five slides:
 
 - Publish the product code in a repository on `GitHub`.
 
-  The repository name must be called `se-toolkit-hackathon`.
+  The repository must be called `se-toolkit-hackathon`.
 
 - Add the MIT license file to make your product open-source.
 
@@ -164,6 +164,6 @@ Submit a presentation with five slides:
 
   - Deployment:
 
-    - Which OS the VM should run (you may assume `Ubuntu 24.04` like on your university VMs)
+    - Which OS the VM should run on (you may assume `Ubuntu 24.04` like on your university VMs)
     - What should be installed on the VM
     - Step-by-step deployment instructions

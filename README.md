@@ -1,170 +1,184 @@
-# Lab 9 - Quiz and Hackathon
+# Lab 7 — Build a Client with an AI Coding Agent
 
-The lab opens with a quiz and then kicks off the hackathon.
+[Sync your fork](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/syncing-a-fork#syncing-a-fork-branch-from-the-command-line) regularly — the lab gets updated.
 
-To get the full point for the lab, you need to:
+## Product brief
 
-- Pass Tasks 1, 2, 3 during the lab AND
-- Finish Tasks 4 and 5 by the usual deadline of Thursday 23:59.
+> Build a Telegram bot that lets users interact with the LMS backend through chat. Users should be able to check system health, browse labs and scores, and ask questions in plain language. The bot should use an LLM to understand what the user wants and fetch the right data. Deploy it alongside the existing backend on the VM.
 
-Each student builds their own project:
+This is what a customer might tell you. Your job is to turn it into a working product using an AI coding agent (Qwen Code) as your development partner.
 
-- Go from an idea to a deployed product.
-- Use agents and LLMs throughout.
+```
+┌──────────────────────────────────────────────────────────────┐
+│                                                              │
+│  ┌──────────────┐     ┌──────────────────────────────────┐   │
+│  │  Telegram    │────▶│  Your Bot                        │   │
+│  │  User        │◀────│  (aiogram / python-telegram-bot) │   │
+│  └──────────────┘     └──────┬───────────────────────────┘   │
+│                              │                               │
+│                              │ slash commands + plain text    │
+│                              ├───────▶ /start, /help         │
+│                              ├───────▶ /health, /labs        │
+│                              ├───────▶ intent router ──▶ LLM │
+│                              │                    │          │
+│                              │                    ▼          │
+│  ┌──────────────┐     ┌──────┴───────┐    tools/actions      │
+│  │  Docker      │     │  LMS Backend │◀───── GET /items      │
+│  │  Compose     │     │  (FastAPI)   │◀───── GET /analytics  │
+│  │              │     │  + PostgreSQL│◀───── POST /sync      │
+│  └──────────────┘     └──────────────┘                       │
+└──────────────────────────────────────────────────────────────┘
+```
 
-----
+## Requirements
 
-## Task 1 (graded by TA after the lab)
+### P0 — Must have
 
-Pen and paper quiz:
+1. Testable handler architecture — handlers work without Telegram
+2. CLI test mode: `cd bot && uv run bot.py --test "/command"` prints response to stdout
+3. `/start` — welcome message
+4. `/help` — lists all available commands
+5. `/health` — calls backend, reports up/down status
+6. `/labs` — lists available labs
+7. `/scores <lab>` — per-task pass rates
+8. Error handling — backend down produces a friendly message, not a crash
 
-- 20 mins;
-- closed book, no devices;
-- you get 3 random questions from the question bank;
-- answer at least 2.
+### P1 — Should have
 
-## Task 2 (approved by TA during the lab)
+1. Natural language intent routing — plain text interpreted by LLM
+2. All 9 backend endpoints wrapped as LLM tools
+3. Inline keyboard buttons for common actions
+4. Multi-step reasoning (LLM chains multiple API calls)
 
-Ideate and plan your project.
+### P2 — Nice to have
 
-### Project idea
+1. Rich formatting (tables, charts as images)
+2. Response caching
+3. Conversation context (multi-turn)
 
-The project idea must be:
+### P3 — Deployment
 
-- something simple to build;
-- clearly useful;
-- easy to explain.
+1. Bot containerized with Dockerfile
+2. Added as service in `docker-compose.yml`
+3. Deployed and running on VM
+4. README documents deployment
 
-Define and show to your TA:
+## Learning advice
 
-- End-user of the product
-- What problem your product solves for the end-user?
-- The product idea in one short sentence.
-- What is the product's core feature?
+Notice the progression above: **product brief** (vague customer ask) → **prioritized requirements** (structured) → **task specifications** (precise deliverables + acceptance criteria). This is how engineering work flows.
 
-### Implementation plan
+You are not following step-by-step instructions — you are building a product with an AI coding agent. The learning comes from planning, building, testing, and debugging iteratively.
 
-When the idea is approved, produce a plan for two product versions.
+## Learning outcomes
 
-Version 1 does one core thing well:
+By the end of this lab, you should be able to say:
 
-- Pick the one feature most valuable to the end-user and relatively easy to implement;
-- It is a functioning product, not a prototype;
-- Must be shown to the TA upon completion for feedback.
+1. I turned a vague product brief into a working Telegram bot.
+2. I can ask it questions in plain language and it fetches the right data.
+3. I used an AI coding agent to plan and build the whole thing.
 
-Version 2 builds upon Version 1:
+## Tasks
 
-- Improves the initial feature or adds another one on top;
-- Address TA feedback from the lab;
-- Deploy and make it available for use.
+### Prerequisites
 
-The product must have the following components, each fulfilling a useful function:
+1. Complete the [lab setup](./lab/setup/setup-simple.md#lab-setup)
 
-- backend;
-- database;
-- end-user-facing client: web app, mobile app, or LLM-powered agent, e.g. `nanobot`.
+> **Note**: First time in this course? Do the [full setup](./lab/setup/setup-full.md#lab-setup) instead.
 
-Note:
+### Required
 
-- You can use the setup from Lab 8 or start from scratch.
-- `Telegram` bots are blocked on university VMs.
+1. [Plan and Scaffold](./lab/tasks/required/task-1.md) — P0: project structure + `--test` mode
+2. [Backend Integration](./lab/tasks/required/task-2.md) — P0: slash commands + real data
+3. [Intent-Based Natural Language Routing](./lab/tasks/required/task-3.md) — P1: LLM tool use
+4. [Containerize and Document](./lab/tasks/required/task-4.md) — P3: containerize + deploy
 
-## Task 3 (approved by TA during the lab)
+### Optional
 
-Implement Version 1 outlined in the plan:
+1. [Flutter Web Chatbot](./lab/tasks/optional/task-1.md)
 
-- Build one core feature;
-- Follow best practices and git workflow;
-- Test it yourself and fix bugs;
-- Have the TA try it as a user;
-- Take note of the TA feedback;
-- Get TA's approval for the task to be marked as DONE.
+## Deploy
 
-## Task 4
+### Prerequisites
 
-Implement and deploy Version 2 outlined in the plan:
+Ensure the following environment variables are set in `.env.docker.secret`:
 
-- Build and polish functionality;
-- Take TA feedback into account;
-- Push all code to the GitHub repo (see the detailed instructions below);
-- Follow best practices and git workflow;
-- Document your solution;
-- Dockerize all services;
-- Deploy it to be accessible to use.
+- `BOT_TOKEN` — Telegram bot token from @BotFather
+- `LMS_API_KEY` — API key for the LMS backend
+- `LLM_API_KEY` — API key for the LLM service (Qwen Code)
+- `LLM_API_BASE_URL` — LLM API base URL (use `http://host.docker.internal:42005/v1` for local Qwen proxy)
+- `LLM_API_MODEL` — Model name (e.g., `coder-model`)
 
-Version 2 can be completed during the lab or after it, before the usual deadline.
+### Start the bot
 
-## Task 5 (demo and PDF submitted through Moodle)
+```bash
+cd ~/se-toolkit-lab-7
 
-Submit a presentation with five slides:
+# Stop any running nohup bot process
+pkill -f "bot.py" 2>/dev/null
 
-1. Title:
+# Build and start all services (including the bot)
+docker compose --env-file .env.docker.secret up --build -d
 
-   - Product title
-   - Your name
-   - Your university email
-   - Your group
+# Verify all services are running
+docker compose --env-file .env.docker.secret ps
+```
 
-2. Context:
+You should see the `bot` service running alongside `backend`, `postgres`, `caddy`, and `pgadmin`.
 
-   - End-user of the product
-   - What problem your product solves
-   - The product idea in one short sentence
+### Check bot health
 
-3. Implementation:
+```bash
+# Check if bot container is running
+docker compose --env-file .env.docker.secret ps bot
 
-   - How you built the product
-   - What went into Version 1 and Version 2
-   - What TA feedback points you addressed
+# View bot logs (last 20 lines)
+docker compose --env-file .env.docker.secret logs bot --tail 20
 
-4. Demo:
+# Follow bot logs in real-time
+docker compose --env-file .env.docker.secret logs -f bot
+```
 
-   - Pre-recorded video demonstration of Version 2 with voice-over (no longer than 2 minutes).
-   - _Note:_ **This is the most important part of the presentation**.
+**Expected log output:**
+- "Application started" — bot connected to Telegram successfully
+- "HTTP Request: POST .../getUpdates" — bot is polling for messages
+- No Python tracebacks
 
-5. Links:
+### Verify in Telegram
 
-   - Link and QR code for each of these:
-     - The GitHub repo with the product code
-     - Deployed product (latest version)
+Send these commands to your bot in Telegram:
 
-----
+| Command | Expected Response |
+|---------|-------------------|
+| `/start` | Welcome message with inline keyboard buttons |
+| `/health` | Backend status (e.g., "✅ Backend is healthy. 50 items available.") |
+| `/labs` | List of available labs |
+| `/scores lab-04` | Pass rates for Lab 04 |
+| "what labs are available?" | Natural language response listing labs |
+| "which lab has the lowest pass rate?" | Multi-step reasoning with specific lab name |
 
-## Publishing the product code on GitHub
+### Troubleshooting
 
-- Publish the product code in a repository on `GitHub`.
+**Bot container keeps restarting:**
+```bash
+docker compose --env-file .env.docker.secret logs bot
+```
+Check for missing environment variables or import errors.
 
-  The repository must be called `se-toolkit-hackathon`.
+**/health fails but worked before:**
+Ensure `LMS_API_BASE_URL=http://backend:8000` in docker-compose.yml (not localhost:42002).
 
-- Add the MIT license file to make your product open-source.
+**LLM queries fail:**
+Ensure `LLM_API_BASE_URL` uses `host.docker.internal` to reach the Qwen proxy on the host machine.
 
-- Add `README.md` in the product repository.
+**Build fails at uv sync:**
+Ensure `uv.lock` is copied in the Dockerfile before running `uv sync --frozen`.
 
-  `README.md` structure:
+### Stop the bot
 
-  - Product name (as title)
+```bash
+# Stop only the bot
+docker compose --env-file .env.docker.secret stop bot
 
-  - One-line description
-
-  - Demo:
-    - A couple of relevant screenshots of the product
-
-  - Product context:
-
-    - End users
-    - Problem that your product solves for end users
-    - Your solution
-
-  - Features:
-
-    - Implemented and not yet implemented features
-
-  - Usage:
-
-    - Explain how to use your product
-
-  - Deployment:
-
-    - Which OS the VM should run on (you may assume `Ubuntu 24.04` like on your university VMs)
-    - What should be installed on the VM
-    - Step-by-step deployment instructions
+# Stop all services
+docker compose --env-file .env.docker.secret down
+```

@@ -1,8 +1,18 @@
-# MenuMate — Restaurant Allergen Advisor
+# Menu Guide — Restaurant Allergen Advisor
 
-**One-line summary:** A web-first, Telegram-integrated system that lets restaurant guests instantly discover menu items safe for their allergies and dietary preferences (vegan, gluten-free, etc.), while providing staff a simple admin interface to keep the menu up to date.
+**One-line summary:** AI bot + website for personalized restaurant menu recommendations based on allergies and preferences.
 
 ---
+
+##Screeshots of the product:
+
+'c:/Users/Honor/Pictures/Screenshots/Снимок экрана 2026-04-09 001348.png'
+
+'c:/Users/Honor/Pictures/Screenshots/Снимок экрана 2026-04-09 001458.png'
+
+'c:/Users/Honor/Pictures/Screenshots/Снимок экрана 2026-04-09 001523.png'
+
+'c:/Users/Honor/Pictures/Screenshots/Снимок экрана 2026-04-09 001555.png'
 
 ## Context
 
@@ -11,29 +21,6 @@
 - **Point in the user’s workflow:** Post-seating / pre-order — a guest inspects the menu, quickly flags what they can (and cannot) eat, and places an order with confidence
 - **Problem:** Traditional menus list ingredients, but non-experts miss hidden allergens (e.g., “whey” = dairy) and cross-contamination cues; miscommunication risks health incidents and legal liability
 - **Solution:** A shared digital menu where each dish is tagged with ingredients and allergens; a conversational search engine + quick-filter chips answer natural-language queries (“no milk or nuts”) and highlight safe choices real-time
-
----
-
-## Architecture
-
-```
- ┌─────────────────┐      ┌──────────────┐      ┌─────────────────┐
- │  Customer Web   │─────▶│  Reverse     │─────▶│  Backend FastAPI│
- │  (index.html)   │      │  Proxy Caddy │      │  (Python)       │
- │  Admin Web      │─────▶│  / /admin    │      │                 │
- │  (admin.html)   │      └──────────────┘      │  • /api/dishes  │
- └─────────────────┘                            │  • /api/check   │
-         │                                      │  • / /admin     │
-         │                                      └────────┬────────┘
-         │                                                │
-         │                                        PostgreSQL DB
-         │                                                │
-         ▼                                                ▼
- ┌─────────────────┐                            ┌──────────────────┐
- │ Telegram Bot    │────────────────────────────▶│  Dishes CRUD     │
- │ (@bot)          │   REST API (/api/… )        │  Allergen filter │
- └─────────────────┘                            └──────────────────┘
-```
 
 ---
 
@@ -99,10 +86,10 @@ docker compose logs -f backend
 ```
 
 Access:
-- Customer UI: http://127.0.0.1:8000
-- Admin UI: http://127.0.0.1:8000/admin
-- API docs: http://127.0.0.1:8000/docs
-- pgAdmin: http://127.0.0.1:8085 (user `admin@example.com`, pass `admin`) — connect to
+- Customer UI: https://10.93.26.29:8000
+- Admin UI: http://10.93.26.29:8000/admin
+- API docs: http://10.93.26.29:8000/docs
+- pgAdmin: http://10.93.26.29:8085 (user `admin@example.com`, pass `admin`) — connect to
   Host `postgres`, port `5432`, user `postgres`, password `postgres`
 
 ### Create your first menu item
@@ -207,58 +194,9 @@ curl -s -X POST http://127.0.0.1:8000/api/check \
 5. Validate with the commands in the previous section.
 6. (Optional) Set up SSL certificates via Caddy by ensuring DNS A record resolves to the host; HTTPS is automatic.
 
-### Reverse-proxy note
-Port 80 is exposed by the `caddy` service. If you already run another web server, change `ports:` mapping for `caddy` to, e.g., `"127.0.0.1:8080:80"` and reverse-proxy from your chosen public entry.
-
----
-
-## Environment Variables
-
-| Variable              | Scope   | Description                                       |
-|-----------------------|---------|---------------------------------------------------|
-| `POSTGRES_USER`       | Compose | DB superuser                                      |
-| `POSTGRES_PASSWORD`   | Compose | DB password                                       |
-| `BASE_DOMAIN`         | Compose | Public domain for Caddy certificates (optional)   |
-| `BOT_TOKEN`           | Bot     | Telegram bot token (required)                     |
-| `LMS_API_BASE_URL`    | Bot     | Override backend URL; defaults to `http://backend:8000` |
-| `LLM_API_KEY`         | Bot     | LLM provider key for intent extraction            |
-| `LLM_API_BASE_URL`    | Bot     | LLM provider base URL                             |
-| `LLM_API_MODEL`       | Bot     | Model name (default: `qwen-coder`)                |
-
----
-
-## Troubleshooting
-
-- **Bot does not start:** Missing `BOT_TOKEN` in `bot/.env.bot`. Obtain one from [@BotFather](https://t.me/BotFather).
-- **No dishes appear in frontend:** Backend returns 200 but empty list — ensure seed data loaded: `docker compose exec postgres psql -U postgres -d restaurant -c "SELECT * FROM dish;"`. If empty, run `docker compose exec backend python -c "from app.database import init_db, async_engine; import asyncio; asyncio.run(init_db())"` (fewer steps in prod: data is loaded on first start).
-- **Port 80 already in use:** Change Caddy’s port mapping in `docker-compose.yml`.
-- **CORS errors in browser:** Add your origin to `BACKEND_CORS_ORIGINS` in `backend/.env` or set `CORS_ORIGINS` in compose.
-- **Caddy permissions errors on startup:** Ensure host folders have sufficient permissions. Alternatively set `RUN_AS=root` for Caddy for quick local testing (not recommended for production).
-
----
-
-## API Reference
-
-| Endpoint          | Method   | Purpose                                          | Example Request                                                 |
-|-------------------|----------|--------------------------------------------------|-----------------------------------------------------------------|
-| `/`               | GET      | Customer UI                                      | `curl http://localhost:8000`                                    |
-| `/admin`          | GET      | Admin UI                                         | `curl http://localhost:8000/admin`                              |
-| `/api/dishes`     | GET      | List all dishes                                  | `curl http://localhost:8000/api/dishes`                         |
-| `/api/dishes`     | POST     | Create a dish                                    | `curl -X POST -H "Content-Type: application/json" -d '{"name":"Salmon","ingredients":"salmon, herbs, oil","allergens":"","is_vegan":false,"is_gluten_free":true}' http://localhost:8000/api/dishes` |
-| `/api/dishes/{id}`| PUT      | Update a dish                                    | `curl -X PUT -H "Content-Type: application/json" -d '{"is_vegan":true}' http://localhost:8000/api/dishes/1` |
-| `/api/dishes/{id}`| DELETE   | Delete a dish                                    | `curl -X DELETE http://localhost:8000/api/dishes/1`             |
-| `/api/check`      | POST     | Allergy/diet query → safe dishes                 | `curl -X POST -H "Content-Type: application/json" -d '{"message":"no milk"}' http://localhost:8000/api/check` |
-| `/docs`           | GET      | OpenAPI Swagger UI                                | `curl http://localhost:8000/docs`                               |
-| `/healthz`        | GET      | Liveness probe                                   | `curl http://localhost:8000/healthz`                            |
-
 ---
 
 ## License
 
 MIT — see [LICENSE](LICENSE) for details.
 
----
-
-## Maintainers
-
-Restaurant Allergen Advisor project — adapted from the SE Toolkit Lab Assistant platform.

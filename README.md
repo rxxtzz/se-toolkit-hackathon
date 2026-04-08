@@ -4,15 +4,16 @@
 
 ---
 
-##Screeshots of the product:
+## Screeshots of the product:
 
-'c:/Users/Honor/Pictures/Screenshots/Снимок экрана 2026-04-09 001348.png'
+<img width="1231" height="700" alt="Снимок экрана 2026-04-09 001348" src="https://github.com/user-attachments/assets/9e6a3c84-5ca1-4cec-a841-a1b3fa02ba30" />
 
-'c:/Users/Honor/Pictures/Screenshots/Снимок экрана 2026-04-09 001458.png'
+<img width="1224" height="1251" alt="Снимок экрана 2026-04-09 001458" src="https://github.com/user-attachments/assets/26d706c6-8f9e-49d0-bddf-61596f9be495" />
 
-'c:/Users/Honor/Pictures/Screenshots/Снимок экрана 2026-04-09 001523.png'
+<img width="1225" height="1342" alt="Снимок экрана 2026-04-09 001523" src="https://github.com/user-attachments/assets/6f2c33af-55c4-46ea-888a-3585b9df0142" />
 
-'c:/Users/Honor/Pictures/Screenshots/Снимок экрана 2026-04-09 001555.png'
+<img width="1153" height="615" alt="Снимок экрана 2026-04-09 001555" src="https://github.com/user-attachments/assets/f3ee1fcc-0110-44f9-a53a-4f557aa678b2" />
+
 
 ## Context
 
